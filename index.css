@@ -71,7 +71,6 @@ header {
 .menu-controls { display: flex; align-items: center; gap: 1em; }
 
 .github-button {
-    margin-right: -2px;
     align-items: center;
     color: var(--text-color);
     width: 22px;
@@ -396,5 +395,6 @@ header {
         opacity: 0;
     }
 }
+
 
 
