@@ -230,11 +230,11 @@ header {
     align-items: center;
     justify-content: center;
     background: transparent;
-    border: 1px solid transparent;   /* <-- IMPORTANT: permet l'animation de border-color */
+    border: 1px solid transparent;
     margin: 0;
     cursor: pointer;
     color: var(--title);
-    width: 34px;     /* zone cliquable unifiée */
+    width: 34px;
     height: 34px;
     padding: 4px;
     border-radius: 6px;
@@ -250,7 +250,7 @@ header {
 
 .icon-btn:hover,
 .icon-btn:focus {
-    background-color: rgba(0,0,0,0.06); /* visible au survol */
+    background-color: rgba(0,0,0,0.06);
     transform: translateY(-1px) scale(1.02);
     box-shadow: 0 6px 18px rgba(2,6,23,0.15);
     filter: brightness(1.03);
@@ -259,12 +259,11 @@ header {
 }
 
 .icon-btn svg {
-    width: 18px;           /* taille visuelle identique */
+    width: 18px;
     height: 18px;
-    display: block;        /* évite le décalage baseline */
-    vector-effect: non-scaling-stroke; /* garde l'épaisseur du trait constante */
+    display: block;
+    vector-effect: non-scaling-stroke;
     overflow: visible;
-    /* assure un centrage cohérent : si possible, ajoute preserveAspectRatio à l'élément SVG */
 }
 
 .icon-btn:focus {
