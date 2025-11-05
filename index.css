@@ -1,28 +1,196 @@
 :root {
-    --bg: #0b0f14;
-    --panel: #0f1720;
-    --muted: #94a3b8;
-    --accent: #22c55e;
-    --text: #e6eef6;
-    --term-bg: #020407;
+    --header-bg: #eee;
+    --main-bg: #fff;
+    --editor-bg: #ddd;
+    --terminal-bg: #bdbdbd;
+    --title: #3c424b;
+    --text-color: #000;
+    --link-color: #444;
 }
 
-* {
-    box-sizing: border-box;
+html.dark {
+    --header-bg: #111;
+    --main-bg: #121212;
+    --editor-bg: #1f1f1f;
+    --terminal-bg: #000000;
+    --title: #94a3b8;
+    --text-color: #ddd;
+    --link-color: #bbb;
+    .menu-toggle {
+        color: #fff;
+        border-color: rgba(34, 34, 34, 0.15);
+        background-color: rgba(34, 34, 34, 0.15);
+    }
 }
 
-html, body, #app {
+html, body {
     height: 100%;
     margin: 0;
     font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    overscroll-behavior: none;
+    overflow: hidden;
+    background: var(--main-bg);
+}
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1em 1em;
+    background: var(--header-bg);
+    color: var(--text-color);
+    z-index: 100000;
+    border-bottom: 1px solid var(--link-color);
+    backdrop-filter: blur(5px);
+    border-bottom-left-radius: 0.3em;
+    border-bottom-right-radius: 0.3em;
+}
+
+.logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+}
+
+.logo-img {
+    width: 28px;
+    height: 28px;
+}
+
+.logo-text {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.menu-controls { display: flex; align-items: center; gap: 1em; }
+
+.github-button {
+    margin-right: -2px;
+    align-items: center;
+    color: var(--text-color);
+    width: 22px;
+    height: 24px;
+}
+
+#download-btn {
+    margin-right: -6px;
+    margin-top: 2px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+}
+#download-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+}
+#download-btn:hover,
+#download-btn:focus {
+    border-color: var(--text-color);
+}
+
+.lang-select {
+    margin-right: 40px;
+    background: var(--main-bg);
+    color: var(--text-color);
+    border: 1px solid var(--link-color);
+    padding: 0 0.4em;
+    border-radius: 0.3em;
+    font-size: 0.9em;
+    height: 22px;
+    appearance: none;
+    cursor: pointer;
+}
+
+.theme-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+}
+
+.theme-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.menu-controls button,
+.menu-controls .play-button,
+.menu-controls .github-button,
+.menu-controls #download-btn,
+.menu-controls .theme-switch,
+.menu-controls .lang-select {
+    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.3s ease, filter 0.3s ease, outline-color 0.3s ease;
+}
+
+.menu-controls button:hover,
+.menu-controls .play-button:hover,
+.menu-controls .github-button:hover,
+.menu-controls #download-btn:hover,
+.menu-controls .theme-switch:hover,
+.menu-controls .lang-select:hover {
+    filter: brightness(1.1)
+        drop-shadow(0 0 8px currentColor);
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: background-color 0.4s;
+    border-radius: 30px;
+    line-height: 1.4;
+}
+
+.slider::before {
+    content: "☀";
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    border-radius: 50%;
+    transition: transform 0.4s, color 0.4s, background-color 0.4s, content 0.4s;
+}
+
+.theme-switch input:checked + .slider {
+    background-color: #333;
+}
+
+.theme-switch input:checked + .slider::before {
+    transform: translateX(18px);
+    content: "☾";
+    color: white;
+    background-color: black;
 }
 
 #app {
+    box-sizing: border-box;
+    margin-top: 4.5em;
     display: flex;
     gap: 12px;
-    padding: 16px;
-    background: linear-gradient(180deg, #071028 0%, #091422 100%);
-    min-height: 100vh;
+    padding : 16px;
+    height: calc(100vh - 4.5em);
+    overflow: hidden;
 }
 
 #left, #right {
@@ -39,11 +207,82 @@ html, body, #app {
 }
 
 .pane-title {
-    background: rgba(255,255,255,0.03);
+    box-sizing: border-box;
+    min-height: 54px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(105, 99, 99, 0.18);
     padding: 10px 14px;
-    color: var(--muted);
+    color: var(--title);
     font-weight: 600;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
+    border-bottom: 1px solid rgba(105, 99, 99, 0.4);
+}
+
+.pane-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;   /* <-- IMPORTANT: permet l'animation de border-color */
+    margin: 0;
+    cursor: pointer;
+    color: var(--title);
+    width: 34px;     /* zone cliquable unifiée */
+    height: 34px;
+    padding: 4px;
+    border-radius: 6px;
+    box-sizing: border-box;
+    transition:
+        background-color 160ms ease,
+        transform 160ms ease,
+        box-shadow 160ms ease,
+        filter 160ms ease,
+        border-color 160ms ease,
+        color 160ms ease;
+}
+
+.icon-btn:hover,
+.icon-btn:focus {
+    background-color: rgba(0,0,0,0.06); /* visible au survol */
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 6px 18px rgba(2,6,23,0.15);
+    filter: brightness(1.03);
+    border-color: rgba(0,0,0,0.08);
+    outline: none;
+}
+
+.icon-btn svg {
+    width: 18px;           /* taille visuelle identique */
+    height: 18px;
+    display: block;        /* évite le décalage baseline */
+    vector-effect: non-scaling-stroke; /* garde l'épaisseur du trait constante */
+    overflow: visible;
+    /* assure un centrage cohérent : si possible, ajoute preserveAspectRatio à l'élément SVG */
+}
+
+.icon-btn:focus {
+    filter: brightness(1.1)
+            drop-shadow(0 0 8px currentColor);
+}
+
+.pane-file-input {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#editor, #terminal {
+    overflow: auto;
 }
 
 #editor {
@@ -52,8 +291,8 @@ html, body, #app {
     padding: 14px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace;
     font-size: 13px;
-    color: var(--text);
-    background: var(--panel);
+    color: var(--text-color);
+    background: var(--editor-bg);
     border: 0;
     outline: 0;
     line-height: 1.45;
@@ -68,7 +307,7 @@ html, body, #app {
 }
 
 .controls button {
-    background: var(--accent);
+    background: #22c55e;
     border: 0;
     color: #03120a;
     padding: 8px 12px;
@@ -77,14 +316,18 @@ html, body, #app {
     cursor: pointer;
 }
 
-.controls button:disabled {
+#status {
+    color: var(--editor-placeholder-color, #888);
+}
+
+#left .controls button:disabled {
     opacity: 0.45;
     cursor: not-allowed;
 }
 
 #right {
-    background: var(--term-bg);
-    color: var(--text);
+    background: var(--terminal-bg);
+    color: var(--text-color);
     min-width: 360px;
 }
 
@@ -115,7 +358,7 @@ html, body, #app {
 }
 
 #cmd-prefix {
-    color: var(--muted);
+    color: var(--title);
 }
 
 #cmd-line {
@@ -154,3 +397,5 @@ html, body, #app {
         opacity: 0;
     }
 }
+
+
