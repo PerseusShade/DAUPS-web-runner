@@ -1,15 +1,9 @@
-import asyncio
 import inspect
 
 try:
     __js_write
 except NameError:
     __js_write = None
-
-try:
-    __js_get_input
-except NameError:
-    __js_get_input = None
 
 try:
     __js_await_input
@@ -27,17 +21,6 @@ def web_write(s):
             print(str(s), end='')
         except Exception:
             pass
-
-def web_get_input_sync():
-    try:
-        if __js_get_input is not None:
-            val = __js_get_input()
-            if val is None:
-                return None
-            return str(val)
-    except Exception:
-        pass
-    return None
 
 async def web_await_input(prompt=""):
     try:
@@ -1876,6 +1859,7 @@ class BuiltInFunction(BaseFunction):
             array = [array]*i
 
         def create_nested_array(dimensions):
+            check_stop()
             if len(dimensions) == 1:
                 return ['' for _ in range(dimensions[0])]
             else:
@@ -1886,13 +1870,28 @@ class BuiltInFunction(BaseFunction):
         return res.success(List(array))
     execute_create_array.arg_names = []
 
-    def execute_print(self, exec_ctx):
+    async def execute_print(self, exec_ctx):
+        """
+        Print builtin — maintenant async pour forcer un yield
+        après l'écriture afin que le navigateur puisse peindre
+        ligne par ligne.
+        """
         args = exec_ctx.symbol_table.get("args").elements
         s = " ".join(str(arg) for arg in args)
+
         try:
             web_write(s)
         except Exception:
-            print(s, end='')
+            try:
+                print(s)
+            except Exception:
+                pass
+        try:
+            import asyncio
+            await asyncio.sleep(0)
+        except Exception:
+            pass
+
         return RTResult().success(Number.null)
 
     async def execute_get(self, exec_ctx, idx=None):
@@ -2073,6 +2072,11 @@ class Interpreter:
         elements = []
 
         for element_node in node.element_nodes:
+            try:
+                check_stop()
+            except KeyboardInterrupt:
+                return res.failure(RTError(node.pos_start, node.pos_end, "Execution stopped by user", context))
+
             elements.append(res.register(await self.visit(element_node, context)))
             if res.should_return(): return res
 
@@ -2218,6 +2222,11 @@ class Interpreter:
         elements = []
 
         while True:
+            try:
+                check_stop()
+            except KeyboardInterrupt:
+                return res.failure(RTError(node.pos_start, node.pos_end, "Execution stopped by user", context))
+
             condition = res.register(await self.visit(node.condition_node, context))
             if res.should_return(): return res
 
@@ -2248,8 +2257,13 @@ class Interpreter:
             add = -1
 
         while condition():
+            try:
+                check_stop()
+            except KeyboardInterrupt:
+                return res.failure(RTError(node.pos_start, node.pos_end, "Execution stopped by user", context))
+
             context.symbol_table.set(node.var_name_tok.value, Number(i))
-            i+=add
+            i += add
             elements.append(res.register(await self.visit(node.body_node, context)))
             if res.should_return(): return res
 
@@ -2283,6 +2297,11 @@ class Interpreter:
                 arg_value = res.register(await self.visit(arg_node, context))
                 if res.should_return(): return res
             args.append(arg_value)
+
+        try:
+            check_stop()
+        except KeyboardInterrupt:
+            return res.failure(RTError(node.pos_start, node.pos_end, "Execution stopped by user", context))
 
         maybe_ret = value_to_call.execute(args)
         if inspect.isawaitable(maybe_ret):
@@ -2346,9 +2365,25 @@ def reset_global_symbol_table():
     global_symbol_table.set("size", BuiltInFunction.size)
     global_symbol_table.set("Pi", Number(3.141592653589793))
 
+def check_stop():
+    try:
+        flag = globals().get("__stop_requested", False)
+        if bool(flag):
+            raise KeyboardInterrupt("Execution stopped by user")
+    except KeyboardInterrupt:
+        raise
+    except Exception:
+        pass
+
+
 async def run_async(fn, text):
     reset_global_symbol_table()
     text += "\n"
+
+    try:
+        globals()["__stop_requested"] = False
+    except Exception:
+        pass
 
     # Generate tokens
     lexer = Lexer(fn, text)
@@ -2365,8 +2400,21 @@ async def run_async(fn, text):
     interpreter = Interpreter()
     context = Context('<program>')
     context.symbol_table = global_symbol_table
-    for ast in astL:
-        result = await interpreter.visit(ast.node, context)
+    try:
+        for ast in astL:
+            try:
+                check_stop()
+            except KeyboardInterrupt:
+                pos = Position(0, 0, 0, fn, text)
+                return None, RTError(pos, pos, "Execution stopped by user", context)
+
+            result = await interpreter.visit(ast.node, context)
+    except KeyboardInterrupt:
+        pos = Position(0, 0, 0, fn, text)
+        return None, RTError(pos, pos, "Execution stopped by user", context)
+    except Exception as e:
+        pos = Position(0, 0, 0, fn, text)
+        return None, RTError(pos, pos, f"Unhandled exception: {e}", context)
 
     return result.value, result.error
 

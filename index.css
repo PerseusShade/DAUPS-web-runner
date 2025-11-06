@@ -70,33 +70,18 @@ header {
 
 .menu-controls { display: flex; align-items: center; gap: 1em; }
 
+.doc-button {
+    align-items: center;
+    color: var(--text-color);
+    width: 28px;
+    height: 28px;
+}
+
 .github-button {
     align-items: center;
     color: var(--text-color);
     width: 22px;
     height: 24px;
-}
-
-#download-btn {
-    margin-right: -6px;
-    margin-top: 2px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    width: 28px;
-    height: 28px;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-color);
-}
-#download-btn svg {
-    width: 16px;
-    height: 16px;
-    stroke: currentColor;
-}
-#download-btn:hover,
-#download-btn:focus {
-    border-color: var(--text-color);
 }
 
 .lang-select {
@@ -128,7 +113,7 @@ header {
 .menu-controls button,
 .menu-controls .play-button,
 .menu-controls .github-button,
-.menu-controls #download-btn,
+.menu-controls .doc-button,
 .menu-controls .theme-switch,
 .menu-controls .lang-select {
     transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease, box-shadow 0.3s ease, filter 0.3s ease, outline-color 0.3s ease;
@@ -137,7 +122,7 @@ header {
 .menu-controls button:hover,
 .menu-controls .play-button:hover,
 .menu-controls .github-button:hover,
-.menu-controls #download-btn:hover,
+.menu-controls .doc-button:hover,
 .menu-controls .theme-switch:hover,
 .menu-controls .lang-select:hover {
     filter: brightness(1.1)
@@ -314,6 +299,12 @@ header {
     cursor: pointer;
 }
 
+.controls #stopBtn {
+    background: #ef4444;
+    color: white;
+    margin-left: auto;
+}
+
 #status {
     color: var(--editor-placeholder-color, #888);
 }
@@ -340,14 +331,14 @@ header {
 
 #output {
     white-space: pre-wrap;
-    display: inline-block;
+    display: inline;
     font-family: ui-monospace, Menlo, Monaco, monospace;
     font-size: 13px;
     vertical-align: baseline;
 }
 
 #input-line {
-    display: inline-block;
+    display: inline;
     vertical-align: baseline;
     margin: 0;
     padding: 0;
@@ -375,26 +366,26 @@ header {
 }
 
 #block-caret {
+    display: none;
     position: absolute;
-    display: inline-block;
     pointer-events: none;
     line-height: 1.2;
     font-family: ui-monospace, Menlo, Monaco, monospace;
     font-size: 13px;
     transform: translateY(0);
-    transition: none;
-    will-change: left, top;
+    animation: blink 1s steps(1, start) infinite;
+    will-change: left, top, opacity;
 }
 
+#terminal[aria-disabled="true"] #block-caret {
+    display: none !important;
+}
 .hidden {
     display: none;
 }
 
 @keyframes blink {
-    50% {
-        opacity: 0;
-    }
+    0%   { opacity: 1; }
+    50%  { opacity: 0; }
+    100% { opacity: 1; }
 }
-
-
-
