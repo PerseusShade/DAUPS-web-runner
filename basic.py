@@ -1871,11 +1871,6 @@ class BuiltInFunction(BaseFunction):
     execute_create_array.arg_names = []
 
     async def execute_print(self, exec_ctx):
-        """
-        Print builtin — maintenant async pour forcer un yield
-        après l'écriture afin que le navigateur puisse peindre
-        ligne par ligne.
-        """
         args = exec_ctx.symbol_table.get("args").elements
         s = " ".join(str(arg) for arg in args)
 
@@ -2431,4 +2426,5 @@ async def run_file(path):
 
     result, error = await run_async(path, source)
     if error:
+
         print(error.as_string())
