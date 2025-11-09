@@ -648,7 +648,7 @@ class ParseResult:
 
 
 ######################################
-# Parser
+# PARSER
 ######################################
 
 class Parser:
@@ -1872,7 +1872,18 @@ class BuiltInFunction(BaseFunction):
 
     async def execute_print(self, exec_ctx):
         args = exec_ctx.symbol_table.get("args").elements
-        s = " ".join(str(arg) for arg in args)
+        s = ""
+        first = True
+        for arg in args:
+            a = str(arg)
+            if a == "\n":
+                s += "\n"
+                first = True
+            else:
+                if not first:
+                    s += " "
+                s += a
+                first = False
 
         try:
             web_write(s)
@@ -2426,5 +2437,4 @@ async def run_file(path):
 
     result, error = await run_async(path, source)
     if error:
-
         print(error.as_string())
